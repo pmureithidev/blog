@@ -1,7 +1,7 @@
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -42,14 +42,19 @@ class PostDetailView(DetailView):
             status=Post.Status.PUBLISHED
         )
 
-        # comments in posts
-        form = CommentForm()
-
         return get_object_or_404(queryset,
                                  publish__year=year,
                                  publish__month=month,
                                  publish__day=day,
                                  slug=slug)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add the comment form to context
+        context['comment_form'] = CommentForm()
+        # Display all the active comments on the post detail page
+        context['comments'] = self.object.comments.filter(active=True)
+        return context
     
 # share posts via email view
 class EmailPostFormView(FormView):
@@ -60,7 +65,7 @@ class EmailPostFormView(FormView):
     # getting the post by id
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # passing the post ot the template
+        # passing the post to the template
         context['post'] = Post.objects.get(id=self.kwargs['pk'])
         return context
     
@@ -95,5 +100,24 @@ class EmailPostFormView(FormView):
 class CommentCreateView(CreateView):
     model = Comment
     form_class = CommentForm
-    template_name = 'comment_form.html'
-    success_url = reverse_lazy('post-detail')
+    template_name = "includes/comment_form.html"
+
+    def form_valid(self, form):
+        # Get post by PK from URL
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        form.instance.post = post
+        return super().form_valid(form)
+    
+    # this is becuase we used the year/month/day/slug in the post detail view
+    def get_success_url(self):
+        # Redirect to the SEO-friendly post URL
+        post = self.object.post
+        # return reverse('includes/comments.html', kwargs={'pk': self.object.post.pk})
+        return reverse('post-detail', kwargs={
+            'year': post.publish.year,
+            'month': post.publish.month,
+            'day': post.publish.day,
+            'slug': post.slug
+        })
+    
+    
