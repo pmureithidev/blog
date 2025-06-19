@@ -19,3 +19,20 @@ pip install -r requirements.txt
 Create a .env file in the project folder
 
 Edit .env with your settings
+## Apply Database Migrations
+```
+python manage.py migrate
+```
+## Create Superuser 
+This is for admin access since the project doesn't have authentification to let other users create accounts and write posts.  
+This feature will be added in due course.
+```
+python manage.py createsuperuser
+```
+## Run the Development Server
+```
+python manage.py runserver
+```
+## Access the Project
+- Open your browser to: http://localhost:8000
+* Admin panel: http://localhost:8000/admin
