@@ -21,6 +21,9 @@ Create a .env file in the project folder
 Edit .env with your settings
 ## Apply Database Migrations
 ```
+python manage.py makemigrations
+```
+```
 python manage.py migrate
 ```
 ## Create Superuser 
