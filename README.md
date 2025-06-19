@@ -17,4 +17,5 @@ pip install -r requirements.txt
 ```
 ## Configure Environment Variables
 Create a .env file in the project folder
+
 Edit .env with your settings
