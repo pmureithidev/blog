@@ -1,0 +1,10 @@
+<h2>Add a new comment</h2>
+<form action="{% url 'add-comment' post.pk %}" method="post">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add comment"></p>
+</form>
+
+<p>
+    <a href="{{ post.get_absolute_url }}">Back to post</a>
+</p>
